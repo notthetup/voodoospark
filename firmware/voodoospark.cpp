@@ -1,4 +1,17 @@
+// This #include statement was automatically added by the Spark IDE.
 #include "application.h"
+
+// Comment this out if you don't want MDNS support.
+#include "MDNS/MDNS.h"
+
+#define CoreUID "ourSparkCore"
+
+#ifdef _INCL_MDNS
+ #define MDNS_SUPPORT
+ SYSTEM_MODE(SEMI_AUTOMATIC)
+ MDNS mdns;
+ bool mdnsReady = false;
+#endif
 
 // allow use of itoa() in this scope
 extern char* itoa(int a, char* buffer, unsigned char radix);
@@ -289,6 +302,15 @@ void restore() {
 }
 
 void setup() {
+
+#ifdef MDNS_SUPPORT
+  WiFi.on();
+  WiFi.connect();
+  while (!WiFi.ready()) {
+    Serial.println("Waiting for WiFi...");
+    delay(100);
+  }
+#endif
 
   server.begin();
   netapp_ipconfig(&ip_config);
@@ -760,6 +782,28 @@ void processInput() {
 }
 
 void loop() {
+#ifdef MDNS_SUPPORT
+  IPAddress addr = WiFi.localIP();
+  if(!mdnsReady && (addr[0] != 0 || addr[1] != 0 || addr[2] != 0 || addr[3] != 0)){
+    WiFi.ping(WiFi.gatewayIP());
+
+    bool success = mdns.setHostname(CoreUID);
+
+    if (success) {
+      success = mdns.setService("tcp", "firmata", HTTP_PORT, CoreUID);;
+    }
+
+    if (success) {
+      success = mdns.begin();
+      mdnsReady = true;
+    }
+  }
+
+  if (mdnsReady){
+    mdns.processQueries();
+  }
+#endif
+
   if (client.connected()) {
 
     if (!isConnected) {
