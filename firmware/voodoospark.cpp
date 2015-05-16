@@ -790,7 +790,7 @@ void loop() {
     bool success = mdns.setHostname(CoreUID);
 
     if (success) {
-      success = mdns.setService("tcp", "firmata", HTTP_PORT, CoreUID);;
+      success = mdns.setService("tcp", "firmata", PORT, CoreUID);;
     }
 
     if (success) {
