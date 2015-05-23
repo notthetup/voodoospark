@@ -328,8 +328,6 @@ void setup() {
   itoa(ip[2], octet, 10); strcat(ipAddress, octet); strcat(ipAddress, ".");
   itoa(ip[3], octet, 10); strcat(ipAddress, octet); strcat(ipAddress, ":");
   itoa(PORT, octet, 10);  strcat(ipAddress, octet);
-
-  Spark.variable("endpoint", ipAddress, STRING);
 }
 
 void processInput() {
