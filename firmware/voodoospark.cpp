@@ -4,8 +4,6 @@
 // Comment this out if you don't want MDNS support.
 #include "MDNS/MDNS.h"
 
-#define CoreUID "ourSparkCore"
-
 #ifdef _INCL_MDNS
  #define MDNS_SUPPORT
  SYSTEM_MODE(SEMI_AUTOMATIC)
@@ -785,10 +783,11 @@ void loop() {
   if(!mdnsReady && (addr[0] != 0 || addr[1] != 0 || addr[2] != 0 || addr[3] != 0)){
     WiFi.ping(WiFi.gatewayIP());
 
-    bool success = mdns.setHostname(CoreUID);
+    String myIDStr = Spark.deviceID();
+    bool success = mdns.setHostname(myIDStr);
 
     if (success) {
-      success = mdns.setService("tcp", "firmata", PORT, CoreUID);;
+      success = mdns.setService("tcp", "firmata", PORT, myIDStr);;
     }
 
     if (success) {
